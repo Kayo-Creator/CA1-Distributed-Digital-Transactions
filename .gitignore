@@ -1,0 +1,9 @@
+# Keep the local Python environment out of Git.
+.venv/
+
+# Ignore generated Python cache files.
+__pycache__/
+*.py[cod]
+
+# Keep local environment settings out of Git.
+.env
