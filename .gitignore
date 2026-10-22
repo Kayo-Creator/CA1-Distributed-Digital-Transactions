@@ -7,3 +7,11 @@ __pycache__/
 
 # Keep local environment settings out of Git.
 .env
+
+# Generated Remix files
+/.deps/
+/.states/
+/artifacts/
+
+# Local formatting settings
+/.prettierrc.json
