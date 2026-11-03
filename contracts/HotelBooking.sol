@@ -5,6 +5,15 @@ contract HotelBooking {
     // The deploying account turns into the hotel owner.
     address public immutable owner;
 
+        // Booking payments that the hotel owner has not collected yet.
+    uint256 public pendingPaymentsWei;
+
+    // Record successful withdrawals in the transaction log.
+    event PaymentsWithdrawn(
+        address indexed hotelOwner,
+        uint256 amountWei
+    );
+
     // Information stored for each registered room.
     struct Room {
         uint256 pricePerNightWei;
@@ -103,11 +112,13 @@ contract HotelBooking {
             guest: msg.sender,
             amountPaidWei: msg.value
         });
+                // Add this booking's payment to the owner's available funds.
+        pendingPaymentsWei += msg.value;
 
         emit RoomBooked(roomId, bookingDay, msg.sender, msg.value);
     }
 
-    // Read an existing booking, including historical bookings.
+        // Read an existing booking, including historical bookings.
     function getBooking(
         uint256 roomId,
         uint256 bookingDay
@@ -127,5 +138,19 @@ contract HotelBooking {
         return (booking.guest, booking.amountPaidWei);
     }
 
+    // Allow the hotel owner to collect uncollected booking payments.
+    function withdrawPayments() external onlyOwner {
+        // Checks: confirm that payments are available.
+        uint256 amountWei = pendingPaymentsWei;
+        require(amountWei > 0, "No payments to withdraw");
 
+        // Effects: clear the amount before sending the payment.
+        pendingPaymentsWei = 0;
+
+        // Interactions: send the payment to the hotel owner.
+        (bool success, ) = payable(owner).call{value: amountWei}("");
+        require(success, "Withdrawal failed");
+
+        emit PaymentsWithdrawn(owner, amountWei);
+    }
 }
