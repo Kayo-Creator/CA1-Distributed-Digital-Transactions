@@ -43,10 +43,9 @@ def show_room_price(w3, hotel):
     )
 
 
-def read_booking_date():
+def read_booking_date(require_future=True):
     date_text = input("Booking date (YYYY-MM-DD, UTC): ").strip()
 
-    # Share the same date validation between availability and booking.
     try:
         booking_date = date.fromisoformat(date_text)
     except ValueError:
@@ -54,9 +53,15 @@ def read_booking_date():
 
     if booking_date.isoformat() != date_text:
         raise ValueError("Use YYYY-MM-DD format.")
-    if booking_date <= datetime.now(timezone.utc).date():
+
+    if booking_date < date(1970, 1, 1):
+        raise ValueError("Choose a date on or after 1970-01-01.")
+
+    # Booking and availability require future dates; record lookup allows history.
+    if require_future and booking_date <= datetime.now(timezone.utc).date():
         raise ValueError("Choose a date after today (UTC).")
 
+    # Convert the UTC calendar date into the day number used by Solidity.
     booking_day = (booking_date - date(1970, 1, 1)).days
     return booking_date, booking_day
 
@@ -69,6 +74,20 @@ def check_availability(hotel):
     status = "available" if available else "already booked"
     print(f"Room {room_id} on {booking_date}: {status}.")
 
+def show_booking(w3, hotel):
+    room_id = read_room_id()
+    booking_date, booking_day = read_booking_date(require_future=False)
+
+    # Read the saved reservation, including records for past dates.
+    guest, amount_paid_wei = hotel.functions.getBooking(
+        room_id, booking_day
+    ).call()
+
+    print("\nBOOKING RECORD")
+    print("Room:", room_id)
+    print("Date (UTC):", booking_date)
+    print("Guest:", guest)
+    print("Amount paid:", w3.from_wei(amount_paid_wei, "ether"), "test ETH")
 
 def main():
     try:
@@ -92,6 +111,7 @@ def main():
             print("3. Check room availability")
             print("4. Change account")
             print("5. Book a room")
+            print("6. View a booking")
             print("0. Exit")
 
             choice = input("Choose an option: ").strip()
@@ -110,12 +130,14 @@ def main():
                 book_room(
                     w3, hotel, active_account, room_id, booking_date, booking_day
                 )
+
+            elif choice == "6":
+                show_booking(w3, hotel)
             elif choice == "0":
                 print("Goodbye.")
                 return 0
             else:
-                print("Choose a number from 0 to 5.")
-
+                print("Choose a number from 0 to 6.")
         except ValueError as error:
             print("Input error:", error)
         except Web3Exception as error:
@@ -123,6 +145,8 @@ def main():
                 print("That room is not registered.")
             elif "Room already booked" in str(error):
                 print("That room is already booked for this date.")
+            elif "Booking does not exist" in str(error):
+                print("No booking exists for that room and date.")
             elif "Booking day must be in future" in str(error):
                 print("Choose a future booking date.")
             else:
