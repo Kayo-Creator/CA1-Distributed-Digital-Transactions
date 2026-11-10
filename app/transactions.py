@@ -60,3 +60,48 @@ def book_room(w3, hotel, account, room_id, booking_date, booking_day):
         return
 
     print("Booking confirmed at block", receipt["blockNumber"])
+
+def register_room(w3, hotel, account, room_id):
+    # Give feedback; Solidity also enforces ownership on-chain.
+    if account != hotel.functions.owner().call():
+        print("Only the hotel owner can register rooms.")
+        return
+
+    # Keep prices as whole wei amounts to avoid rounding.
+    try:
+        price_wei = int(input("Nightly price (wei): ").strip())
+    except ValueError:
+        raise ValueError("Enter the nightly price as a whole number of wei.") from None
+
+    if price_wei <= 0:
+        raise ValueError("Nightly price must be greater than zero.")
+    if price_wei >= 2**256:
+        raise ValueError("Nightly price is too large.")
+
+    print("\nROOM REGISTRATION")
+    print("Room:", room_id)
+    print("Nightly price:", w3.from_wei(price_wei, "ether"), "test ETH")
+    print("Registration costs gas; no booking payment is sent.")
+
+    if input("Confirm registration? (y/N): ").strip().lower() != "y":
+        print("Registration cancelled.")
+        return
+
+    # Store the room and its price without transferring a booking payment.
+    tx_hash = hotel.functions.addRoom(room_id, price_wei).transact(
+        {"from": account, "value": 0}
+    )
+    print("Submitted transaction:", w3.to_hex(tx_hash))
+
+    # Report success after checking the confirmed receipt.
+    try:
+        receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=60)
+    except TimeExhausted:
+        print("Confirmation is pending. Check this transaction before retrying.")
+        return
+
+    if receipt["status"] != 1:
+        print("Transaction failed. Room registration was not confirmed.")
+        return
+
+    print("Room registered at block", receipt["blockNumber"])
