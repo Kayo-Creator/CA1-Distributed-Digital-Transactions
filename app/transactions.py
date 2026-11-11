@@ -105,3 +105,42 @@ def register_room(w3, hotel, account, room_id):
         return
 
     print("Room registered at block", receipt["blockNumber"])
+def withdraw_payments(w3, hotel, account):
+    # Give clear feedback; Solidity independently enforces owner permission.
+    if account != hotel.functions.owner().call():
+        print("Only the hotel owner can withdraw payments.")
+        return
+
+    # Avoid sending a transaction when no booking payments remain.
+    amount_wei = hotel.functions.pendingPaymentsWei().call()
+    if amount_wei == 0:
+        print("No payments are available to withdraw.")
+        return
+
+    print("\nPAYMENT WITHDRAWAL")
+    print("Recipient:", account)
+    print("Available to withdraw:", w3.from_wei(amount_wei, "ether"), "test ETH")
+    print("The owner also pays the transaction's gas fee.")
+
+    if input("Confirm withdrawal? (y/N): ").strip().lower() != "y":
+        print("Withdrawal cancelled.")
+        return
+
+    # Request a payout of funds already held by the contract.
+    tx_hash = hotel.functions.withdrawPayments().transact(
+        {"from": account, "value": 0}
+    )
+    print("Submitted transaction:", w3.to_hex(tx_hash))
+
+    # A transaction hash alone does not prove that the withdrawal succeeded.
+    try:
+        receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=60)
+    except TimeExhausted:
+        print("Confirmation is pending. Check this transaction before retrying.")
+        return
+
+    if receipt["status"] != 1:
+        print("Transaction failed. Withdrawal was not confirmed.")
+        return
+
+    print("Withdrawal confirmed at block", receipt["blockNumber"])

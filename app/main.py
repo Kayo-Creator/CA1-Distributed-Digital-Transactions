@@ -4,7 +4,12 @@ from web3.exceptions import Web3Exception
 
 from blockchain import connect_contract
 
-from transactions import select_account, book_room, register_room
+from transactions import (
+    select_account,
+    book_room,
+    register_room,
+    withdraw_payments,
+)
 
 
 def read_room_id():
@@ -113,6 +118,7 @@ def main():
             print("5. Book a room")
             print("6. View a booking")
             print("7. Register a room")
+            print("8. Withdraw payments")
             print("0. Exit")
 
             choice = input("Choose an option: ").strip()
@@ -138,11 +144,14 @@ def main():
             elif choice == "7":
                 room_id = read_room_id()
                 register_room(w3, hotel, active_account, room_id)
+
+            elif choice == "8":
+                withdraw_payments(w3, hotel, active_account)
             elif choice == "0":
                 print("Goodbye.")
                 return 0
             else:
-                print("Choose a number from 0 to 6.")
+                print("Choose a number from 0 to 8.")
         except ValueError as error:
             print("Input error:", error)
         except Web3Exception as error:
@@ -150,6 +159,8 @@ def main():
                 print("That room is not registered.")
             elif "Room already exists" in str(error):
                 print("That room is already registered.")
+            elif "No payments to withdraw" in str(error):
+                print("No payments are available to withdraw.")
             elif "Room already booked" in str(error):
                 print("That room is already booked for this date.")
             elif "Booking does not exist" in str(error):
