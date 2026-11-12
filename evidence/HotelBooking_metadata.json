@@ -1,0 +1,242 @@
+{
+	"compiler": {
+		"version": "0.8.37+commit.f401782d"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "hotelOwner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amountWei",
+						"type": "uint256"
+					}
+				],
+				"name": "PaymentsWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "roomId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "bookingDay",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "guest",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amountPaidWei",
+						"type": "uint256"
+					}
+				],
+				"name": "RoomBooked",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "roomId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "pricePerNightWei",
+						"type": "uint256"
+					}
+				],
+				"name": "addRoom",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "roomId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bookingDay",
+						"type": "uint256"
+					}
+				],
+				"name": "bookRoom",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "roomId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bookingDay",
+						"type": "uint256"
+					}
+				],
+				"name": "checkAvailability",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "roomId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bookingDay",
+						"type": "uint256"
+					}
+				],
+				"name": "getBooking",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "guest",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountPaidWei",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "roomId",
+						"type": "uint256"
+					}
+				],
+				"name": "getRoom",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "pricePerNightWei",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pendingPaymentsWei",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "withdrawPayments",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/HotelBooking.sol": "HotelBooking"
+		},
+		"evmVersion": "paris",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/HotelBooking.sol": {
+			"keccak256": "0x7bab0eaa5c4304df6175cbc95fd913ae4a470b370fed9c321a59ed49f6e3268e",
+			"license": "UNLICENSED",
+			"urls": [
+				"bzz-raw://563bc263f680b1db1a5e6bac1543a6ee63cc3424a5b17421bc3c0f60e42ac885",
+				"dweb:/ipfs/QmWx7MBVy8Vd8nFPZbmPyWodqzUpkkugRmgRfM7rTaCrpi"
+			]
+		}
+	},
+	"version": 1
+}
